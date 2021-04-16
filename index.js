@@ -111,6 +111,10 @@ function getPosts() {
         let excluded = ids.join('%7C');
         let payload = requestPayload.replace('<%EXCLUDE%>', excluded);
         let response = JSON.parse(httpRequest('POST', urlPosts, payload)).data;
+        if (response.length == 0) {
+            console.log('Max Urls');
+            break;
+        }
         links = links.concat(response.map(item => item.link));
         ids = ids.concat(response.map(item => item.id));
         console.log('Post Count: ' + links.length);
@@ -125,4 +129,7 @@ function httpRequest(method, url, data) {
     xmlHttp.send(data);
     return xmlHttp.responseText;
 }
+
+// https?:\/\/[^(cdnjs.cloudflare.com)] regex for links which aren't smileys
+
 setTimeout(main(), 0);
