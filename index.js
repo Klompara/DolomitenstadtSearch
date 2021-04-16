@@ -29,7 +29,7 @@ function displayFilterMenu() {
     document.body.innerText = '';
     document.write('<h1>Regex-Filter</h1>')
     document.write('Posts: ' + posts.length + '<br>');
-    document.write('Comments: ' + comments.length + '<br><br>');
+    document.write('Comments: ' + comments.length + ' <a id="downloadAnchorElem">Download</a><br><br>');
     document.write('Filter Author: <input type="text" id="inputAuthor"></input><br>');
     document.write('global match<input type="checkbox" id="filterAuthorGlobalMatch" checked></input><br>');
     document.write('case-insensitive<input type="checkbox" id="filterAuthorCase" checked></input><br>');
@@ -39,6 +39,11 @@ function displayFilterMenu() {
     document.write('case-insensitive<input type="checkbox" id="filterCommentCase" checked></input><br>');
     document.write('multiline<input type="checkbox" id="filterCommentMultiline" checked></input><br><br>');
     document.write('<button onclick="filter()">Filter</button>');
+
+    let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(comments));
+    let dlAnchorElem = document.getElementById('downloadAnchorElem');
+    dlAnchorElem.setAttribute("href", dataStr);
+    dlAnchorElem.setAttribute("download", "dataset.json");
 }
 
 function filter() {
