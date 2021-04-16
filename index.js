@@ -39,7 +39,7 @@ function displayFilterMenu(amountFound) {
     document.write('case-insensitive<input type="checkbox" id="filterCommentCase" checked></input><br>');
     document.write('multiline<input type="checkbox" id="filterCommentMultiline" checked></input><br><br>');
     document.write('<button onclick="filter()">Filter</button><br>');
-    if(amountFound != null) {
+    if (amountFound != null) {
         document.write('<span style="color:' + (amountFound == 0 ? 'red' : 'green') + '">Found ' + amountFound + ' matching comments</span>');
     }
     let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(comments));
@@ -88,7 +88,7 @@ async function getComments(url) {
         let commentElement = comments[i];
         let author = commentElement.children[0].children[0].innerText;
         let commentText = Array.from(commentElement.children[1].children).map(elm => elm.innerText).join(" ");
-        let datePosted = commentElement.children[0].children[1].title;
+        let datePosted = commentElement.children[0].children[commentElement.children[0].children.length - 1].title;
         allComments.push({ 'author': author, 'comment': commentText, 'url': url, 'datePosted': datePosted });
     }
     return new Promise((resolve, reject) => {
