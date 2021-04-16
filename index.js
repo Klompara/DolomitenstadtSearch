@@ -22,10 +22,10 @@ async function start() {
         comments = comments.concat(await getComments(posts[i]));
         console.log(Math.floor(100 * (i + 1) / posts.length) + '%');
     }
-    displayFilterMenu();
+    displayFilterMenu(null);
 }
 
-function displayFilterMenu() {
+function displayFilterMenu(amountFound) {
     document.body.innerText = '';
     document.write('<h1>Regex-Filter</h1>')
     document.write('Posts: ' + posts.length + '<br>');
@@ -38,8 +38,10 @@ function displayFilterMenu() {
     document.write('global match<input type="checkbox" id="filterCommentGlobalMatch" checked></input><br>');
     document.write('case-insensitive<input type="checkbox" id="filterCommentCase" checked></input><br>');
     document.write('multiline<input type="checkbox" id="filterCommentMultiline" checked></input><br><br>');
-    document.write('<button onclick="filter()">Filter</button>');
-
+    document.write('<button onclick="filter()">Filter</button><br>');
+    if(amountFound != null) {
+        document.write('<span style="color:' + (amountFound == 0 ? 'red' : 'green') + '">Found ' + amountFound + ' matching comments</span>');
+    }
     let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(comments));
     let dlAnchorElem = document.getElementById('downloadAnchorElem');
     dlAnchorElem.setAttribute("href", dataStr);
@@ -58,7 +60,7 @@ function filter() {
     console.log(regexAuthor);
     console.log(regexComment);
     let filtered = comments.filter(obj => regexAuthor.test(obj.author) && regexComment.test(obj.comment));
-    displayFilterMenu();
+    displayFilterMenu(filtered.length);
     for (let i = 0; i < filtered.length; i++) {
         printComment(filtered[i]);
     }
