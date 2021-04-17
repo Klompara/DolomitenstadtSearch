@@ -7,8 +7,10 @@ let parser = new DOMParser();
 
 function main() {
     document.body.innerHTML = '';
+    document.write('<h1>Comment and author search tool</h1>');
     document.write('Amount of posts: <input type="number" id="amountPosts" value="' + postCount + '"></input><br>');
     document.write('<button onclick="start()">Start</button><br><br>');
+    document.write('or<br>');
     document.write('<input type="file" id="fileInput" onchange="openFile(this.files)" accept="application/json"></input><br><br>');
     document.write('<div id="myProgress" style="width: 100%; background-color: grey;"><div id="myBar" style="width: 0%;height: 30px;background-color: green; text-align: center; line-height: 30px; color: white;"></div></div>');
 }
@@ -68,6 +70,7 @@ async function collectComments() {
 function displayFilterMenu(amountFound) {
     document.body.innerText = '';
     document.write('<h1>Regex-Filter</h1>')
+    document.write('<button onclick="main()">Back to menu</button><br>');
     document.write('Posts: ' + posts.length + '<br>');
     document.write('Comments: ' + comments.length + ' <a id="downloadAnchorElem">Download</a><br><br>');
     document.write('Filter Author: <input type="text" id="inputAuthor"></input><br>');
