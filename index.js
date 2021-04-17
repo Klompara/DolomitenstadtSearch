@@ -22,7 +22,7 @@ function openFile(files) {
         let result = JSON.parse(evt.target.result);
         for (let i = 0; i < result.length; i++) {
             let comment = result[i];
-            if (!(comment.hasOwnProperty('author') && comment.hasOwnProperty('comment') && comment.hasOwnProperty('url') && comment.hasOwnProperty('datePosted'))) {
+            if (!(comment.hasOwnProperty('author') && comment.hasOwnProperty('comment') && comment.hasOwnProperty('url') && comment.hasOwnProperty('datePosted') && comment.hasOwnProperty('id'))) {
                 alert('Not a valid dataset!');
                 console.log(comment);
                 return;
@@ -119,7 +119,7 @@ function printComment(comment) {
     document.write('<br>');
     document.write('Comment: ' + comment.comment);
     document.write('<br>');
-    document.write('<a href="' + comment.url + '" target="_blank">Link</a>');
+    document.write('<a href="' + comment.url + '#' + comment.id + '" target="_blank">Link</a>');
     document.write('<br>');
 }
 
@@ -130,9 +130,10 @@ async function getComments(url) {
     for (let i = 0; i < commentsFromDoc.length; i++) {
         let commentElement = commentsFromDoc[i];
         let author = commentElement.children[0].children[0].innerText;
+        let idOfComment = commentElement.parentElement.id;
         let commentText = Array.from(commentElement.children[1].children).map(elm => elm.innerText).join(" ");
         let datePosted = commentElement.children[0].children[commentElement.children[0].children.length - 1].title;
-        allComments.push({ 'author': author, 'comment': commentText, 'url': url, 'datePosted': datePosted });
+        allComments.push({ 'author': author, 'comment': commentText, 'url': url, 'datePosted': datePosted, 'id': idOfComment });
     }
     return new Promise((resolve, reject) => {
         resolve(allComments);
