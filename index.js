@@ -9,7 +9,8 @@ function main() {
     document.body.innerHTML = '';
     document.write('Amount of posts: <input type="number" id="amountPosts" value="' + postCount + '"></input><br>');
     document.write('<button onclick="start()">Start</button><br><br>');
-    document.write('<input type="file" id="fileInput" onchange="openFile(this.files)" accept="application/json"></input>');
+    document.write('<input type="file" id="fileInput" onchange="openFile(this.files)" accept="application/json"></input><br><br>');
+    document.write('<div id="myProgress" style="width: 100%; background-color: grey;"><div id="myBar" style="width: 0%;height: 30px;background-color: green; text-align: center; line-height: 30px; color: white;"></div></div>');
 }
 
 function openFile(files) {
@@ -38,15 +39,27 @@ async function start() {
 
     posts = getPosts().filter(url => url.includes('www.dolomitenstadt.at')).concat(getLivebarLinks());
 
-    for (let i = 0; i < posts.length; i++) {
-        let newComments = await getComments(posts[i]);
-        for(let j = 0; j < newComments.length; j++) {
+    collectComments();
+}
+
+let postCounter = 0;
+let repeater;
+async function collectComments() {
+    if (postCounter < posts.length) {
+        let newComments = await getComments(posts[postCounter]);
+        for (let j = 0; j < newComments.length; j++) {
             comments.push(newComments[j]);
         }
-        //comments = comments.concat(await getComments(posts[i]));
-        console.log(Math.floor(100 * (i + 1) / posts.length) + '%');
+        let bar = document.getElementById("myBar");
+        let percent = Math.floor(100 * (postCounter + 1) / posts.length) + '%';
+        bar.style.width = percent;
+        bar.innerHTML = percent;
+        postCounter++;
+        repeater = requestAnimationFrame(collectComments);
+    } else {
+        cancelAnimationFrame(repeater);
+        displayFilterMenu(null);
     }
-    displayFilterMenu(null);
 }
 
 function displayFilterMenu(amountFound) {
