@@ -3,6 +3,7 @@ const urlPosts = 'https://www.dolomitenstadt.at/api/load/posts/';
 let postCount = 50;
 let comments = [];
 let posts = [];
+let parser = new DOMParser();
 
 function main() {
     document.body.innerHTML = '';
@@ -38,7 +39,11 @@ async function start() {
     posts = getPosts().filter(url => url.includes('www.dolomitenstadt.at')).concat(getLivebarLinks());
 
     for (let i = 0; i < posts.length; i++) {
-        comments = comments.concat(await getComments(posts[i]));
+        let newComments = await getComments(posts[i]);
+        for(let j = 0; j < newComments.length; j++) {
+            comments.push(newComments[j]);
+        }
+        //comments = comments.concat(await getComments(posts[i]));
         console.log(Math.floor(100 * (i + 1) / posts.length) + '%');
     }
     displayFilterMenu(null);
@@ -100,11 +105,11 @@ function printComment(comment) {
 }
 
 async function getComments(url) {
-    let doc = new DOMParser().parseFromString(httpRequest('GET', url), 'text/html');
-    let comments = Array.from(doc.getElementsByClassName("comments__item__right"));
+    let doc = parser.parseFromString(httpRequest('GET', url), 'text/html');
+    let commentsFromDoc = Array.from(doc.getElementsByClassName("comments__item__right"));
     let allComments = [];
-    for (let i = 0; i < comments.length; i++) {
-        let commentElement = comments[i];
+    for (let i = 0; i < commentsFromDoc.length; i++) {
+        let commentElement = commentsFromDoc[i];
         let author = commentElement.children[0].children[0].innerText;
         let commentText = Array.from(commentElement.children[1].children).map(elm => elm.innerText).join(" ");
         let datePosted = commentElement.children[0].children[commentElement.children[0].children.length - 1].title;
