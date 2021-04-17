@@ -36,9 +36,12 @@ async function start() {
     if (!isNaN(input)) {
         postCount = input;
     }
+    getPosts();
+}
 
-    posts = getPosts().filter(url => url.includes('www.dolomitenstadt.at')).concat(getLivebarLinks());
-
+function finishedGetPosts() {
+    posts = posts.filter(url => url.includes('www.dolomitenstadt.at')).concat(getLivebarLinks());
+    document.write('<br>Fetching Comments..');
     collectComments();
 }
 
@@ -143,27 +146,39 @@ function getLivebarLinks() {
     return links;
 }
 
+let ids = [];
+
 function getPosts() {
-    let links = [];
-    let ids = [];
+    document.write('Fetching Posts...');
     let requestPayload = 'load_category=&load_count=26&load_tag=&load_exclude=<%EXCLUDE%>&load_search_term=';
     let data = JSON.parse(httpRequest('POST', urlPosts, requestPayload.replace('<%EXCLUDE%>', ''))).data;
-    links = data.map(item => item.link);
+    posts = data.map(item => item.link);
     ids = data.map(item => item.id);
+    getPostsLoading();
+}
 
-    while (links.length < postCount) {
+function getPostsLoading() {
+    if (posts.length < postCount) {
+        let requestPayload = 'load_category=&load_count=26&load_tag=&load_exclude=<%EXCLUDE%>&load_search_term=';
         let excluded = ids.join('%7C');
         let payload = requestPayload.replace('<%EXCLUDE%>', excluded);
         let response = JSON.parse(httpRequest('POST', urlPosts, payload)).data;
         if (response.length == 0) {
             console.log('Max Urls');
-            break;
+        } else {
+            posts = posts.concat(response.map(item => item.link));
+            ids = ids.concat(response.map(item => item.id));
+
+            let bar = document.getElementById("myBar");
+            let percent = Math.floor(posts.length / postCount * 100) + '%';
+            bar.style.width = percent;
+            bar.innerHTML = percent;
+            repeater = window.requestAnimationFrame(getPostsLoading);
         }
-        links = links.concat(response.map(item => item.link));
-        ids = ids.concat(response.map(item => item.id));
-        console.log('Post Count: ' + links.length);
+    } else {
+        cancelAnimationFrame(repeater);
+        finishedGetPosts();
     }
-    return links;
 }
 
 function httpRequest(method, url, data) {
