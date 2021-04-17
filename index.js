@@ -7,7 +7,26 @@ let posts = [];
 function main() {
     document.body.innerHTML = '';
     document.write('Amount of posts: <input type="number" id="amountPosts" value="' + postCount + '"></input><br>');
-    document.write('<button onclick="start()">Start</button><br>');
+    document.write('<button onclick="start()">Start</button><br><br>');
+    document.write('<input type="file" id="fileInput" onchange="openFile(this.files)" accept="application/json"></input>');
+}
+
+function openFile(files) {
+    var reader = new FileReader();
+    reader.readAsText(files[0], 'UTF8');
+    reader.onload = function (evt) {
+        let result = JSON.parse(evt.target.result);
+        for (let i = 0; i < result.length; i++) {
+            let comment = result[i];
+            if (!(comment.hasOwnProperty('author') && comment.hasOwnProperty('comment') && comment.hasOwnProperty('url') && comment.hasOwnProperty('datePosted'))) {
+                alert('Not a valid dataset!');
+                console.log(comment);
+                return;
+            }
+        }
+        comments = result;
+        displayFilterMenu(null);
+    }
 }
 
 async function start() {
