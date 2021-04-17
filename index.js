@@ -71,7 +71,7 @@ function displayFilterMenu(amountFound) {
     document.body.innerText = '';
     document.write('<h1>Regex-Filter</h1>')
     document.write('<button onclick="main()">Back to menu</button><br>');
-    document.write('Posts: ' + posts.length + '<br>');
+    document.write('Posts with comments: ' + posts.length + '<br>');
     document.write('Comments: ' + comments.length + ' <a id="downloadAnchorElem">Download</a><br><br>');
     document.write('Filter Author: <input type="text" id="inputAuthor"></input><br>');
     document.write('global match<input type="checkbox" id="filterAuthorGlobalMatch" checked></input><br>');
@@ -167,17 +167,18 @@ function getPostsLoading() {
         let payload = requestPayload.replace('<%EXCLUDE%>', excluded);
         let response = JSON.parse(httpRequest('POST', urlPosts, payload)).data;
         if (response.length == 0) {
-            console.log('Max Urls');
+            document.write('<br>Maximum amount of posts with comments reached: ' + posts.length);
+            postCount = 0;
         } else {
-            posts = posts.concat(response.map(item => item.link));
+            posts = posts.concat(response.filter(item => item.comments != 0).map(item => item.link));
             ids = ids.concat(response.map(item => item.id));
 
             let bar = document.getElementById("myBar");
             let percent = Math.floor(posts.length / postCount * 100) + '%';
             bar.style.width = percent;
             bar.innerHTML = percent;
-            repeater = window.requestAnimationFrame(getPostsLoading);
         }
+        repeater = window.requestAnimationFrame(getPostsLoading);
     } else {
         cancelAnimationFrame(repeater);
         finishedGetPosts();
