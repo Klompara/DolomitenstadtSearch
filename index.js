@@ -29,7 +29,7 @@ function openFile(files) {
             }
         }
         comments = result;
-        displayFilterMenu(null);
+        displayMenu();
     }
 }
 
@@ -63,14 +63,60 @@ async function collectComments() {
         repeater = requestAnimationFrame(collectComments);
     } else {
         cancelAnimationFrame(repeater);
-        displayFilterMenu(null);
+        displayMenu();
     }
+}
+
+function displayMenu() {
+    document.body.innerText = '';
+    document.write('<h1>Menu</h1>');
+    document.write('<button onclick="displayAuthorMenu()">Author Overview</button><br><br>');
+    document.write('<button onclick="displayFilterMenu(null)">Regex Filter</button><br><br>');
+    document.write('<button onclick="main()">Back</button><br><br>');
+}
+
+function displayAuthorMenu() {
+    document.body.innerText = '';
+    document.write('<h1>Author overview</h1>');
+    document.write('<button onclick="displayMenu()">Back</button><br>');
+    let authors = getAuthorInfo();
+    authors = authors.sort((elem1, elem2) => elem2.amount - elem1.amount);
+    document.write('<h3>Amount of authors: ' + authors.length + '</h3>');
+    for(let i = 0; i < authors.length; i++) {
+        let auth = authors[i];
+        document.write('<button onclick="showAuthorPostings(\'' + auth.author + '\')">' + auth.author + '</button><br>');
+        document.write('Postings: ' + auth.amount);
+        document.write('<br><br>');
+    }
+}
+
+function showAuthorPostings(author) {
+    document.body.innerText = '';
+    document.write('<button onclick="displayAuthorMenu()">Back</button><br>');
+    let authorPostings = comments.filter(elem => elem.author == author);
+    for(let i = 0; i < authorPostings.length; i++) {
+        printComment(authorPostings[i]);
+    }
+}
+
+function getAuthorInfo() {
+    let authors = [];
+    for(let i = 0; i < comments.length; i++) {
+        let comment = comments[i];
+        let found = authors.find(elem => elem.author == comment.author);
+        if(found == undefined) {
+            authors.push({'author':comment.author, 'amount':1});
+        }else{
+            authors[authors.findIndex(elem => elem == found)].amount++;
+        }
+    }
+    return authors;
 }
 
 function displayFilterMenu(amountFound) {
     document.body.innerText = '';
     document.write('<h1>Regex-Filter</h1>')
-    document.write('<button onclick="main()">Back to menu</button><br>');
+    document.write('<button onclick="displayMenu()">Back to menu</button><br>');
     document.write('Posts with comments: ' + posts.length + '<br>');
     document.write('Comments: ' + comments.length + ' <a id="downloadAnchorElem">Download</a><br><br>');
     document.write('Filter Author: <input type="text" id="inputAuthor"></input><br>');
